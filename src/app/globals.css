@@ -4,6 +4,38 @@
     light --default,
     dark --prefersdark;
 }
+.eyebrow {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.17em;
+  color: var(--color-success);
+}
+.section-title {
+  margin-top: 0.8rem;
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+.page-title {
+  margin-top: 0.75rem;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+}
+.page-intro {
+  margin: 1rem 0 2.5rem;
+  color: color-mix(in oklab, var(--color-base-content) 65%, transparent);
+}
+html {
+  scroll-behavior: smooth;
+}
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
 body {
   min-height: 100vh;
   display: flex;

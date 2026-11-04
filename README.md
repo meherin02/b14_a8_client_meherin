@@ -22,4 +22,15 @@ Live URL: pending deployment.
 
 Checks: `npm run lint` and `npm run build`.
 
-This is the setup/authentication stage. Event features, profile editing, theme switching, and deployment remain to be implemented. Live registration, session persistence, and Google login require MongoDB/OAuth configuration and end-to-end testing.
+## Client pages and features
+
+- Community home page with banner, features, recent events, gallery and newsletter design.
+- Upcoming events with title/location search and category filters.
+- Public event details and authenticated joining controls.
+- Create/update event forms with future-date validation.
+- Manage events with edit links and delete confirmation.
+- Joined events ordered by date.
+- Editable profile, account dropdown and logout.
+- Saved light/dark theme, loading skeletons, empty states and error recovery.
+
+The client screens and API calls are implemented. Event operations still need the server endpoints described in `API-CONTRACT.md`. Live registration, session persistence, profile updates, Google login and event CRUD/joining need end-to-end testing after database and server setup. The newsletter is a visual section only, as permitted by the assignment. Static illustrative photographs use Unsplash image URLs; event thumbnails come from the database. Deployment and the live URL are still pending.
