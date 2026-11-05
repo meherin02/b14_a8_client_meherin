@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { authClient } from "@/lib/auth-client";
 import JoinEventButton from "./JoinEventButton";
+import DeleteEventDialog from "./DeleteEventDialog";
 
 export const eventTypes = [
   "Cleanup",
@@ -250,37 +251,12 @@ export function EventList({ home = false, joined = false, manage = false }) {
         </div>
       )}
       {deleting && (
-        <div
-          className="modal modal-open"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="delete-title"
-        >
-          <div className="modal-box">
-            <h2 id="delete-title" className="text-xl font-bold">
-              Delete this event?
-            </h2>
-            <p className="mt-3">
-              “{deleting.title}” will be removed. This cannot be undone.
-            </p>
-            <div className="modal-action">
-              <button
-                className="btn"
-                disabled={busy}
-                onClick={() => setDeleting(null)}
-              >
-                Keep event
-              </button>
-              <button
-                className="btn btn-error"
-                disabled={busy}
-                onClick={remove}
-              >
-                {busy ? "Deleting…" : "Delete event"}
-              </button>
-            </div>
-          </div>
-        </div>
+        <DeleteEventDialog
+          title={deleting.title}
+          busy={busy}
+          onCancel={() => setDeleting(null)}
+          onConfirm={remove}
+        />
       )}
     </div>
   );
