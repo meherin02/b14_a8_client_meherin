@@ -32,8 +32,18 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         <AppProviders>
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-base-100 focus:p-3 focus:font-semibold focus:shadow-lg"
+          >
+            Skip to content
+          </a>
           <Navbar />
-          <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-10">
+          <main
+            id="main-content"
+            tabIndex={-1}
+            className="mx-auto w-full max-w-6xl flex-1 px-5 py-10"
+          >
             {children}
           </main>
           <footer className="border-t border-base-300 px-5 py-10 text-sm text-base-content/70">

@@ -9,6 +9,7 @@ export default function Navbar() {
   const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
   const path = usePathname();
+  const browsingEvents = path === "/events" || path.startsWith("/events/");
   async function logout() {
     try {
       const result = await authClient.signOut();
@@ -26,7 +27,11 @@ export default function Navbar() {
         aria-label="Main navigation"
         className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-4"
       >
-        <Link href="/" className="text-lg font-bold tracking-tight sm:text-xl">
+        <Link
+          href="/"
+          aria-current={path === "/" ? "page" : undefined}
+          className="text-lg font-bold tracking-tight sm:text-xl"
+        >
           Community
           <span className="text-success">
             {" "}
@@ -36,8 +41,14 @@ export default function Navbar() {
         <div className="flex flex-wrap items-center gap-2 sm:gap-4">
           <Link
             href="/events"
-            aria-current={path === "/events" ? "page" : undefined}
-            className="text-sm font-semibold"
+            aria-current={
+              path === "/events"
+                ? "page"
+                : browsingEvents
+                  ? "location"
+                  : undefined
+            }
+            className={`text-sm font-semibold ${browsingEvents ? "text-success underline underline-offset-4" : ""}`}
           >
             Upcoming events
           </Link>
@@ -77,20 +88,38 @@ export default function Navbar() {
                     ["/manage-events", "Manage events"],
                     ["/joined-events", "Joined events"],
                     ["/profile", "Your profile"],
-                  ].map(([href, label]) => (
-                    <li key={href}>
-                      <Link
-                        href={href}
-                        onClick={(e) =>
-                          e.currentTarget
-                            .closest("details")
-                            .removeAttribute("open")
-                        }
-                      >
-                        {label}
-                      </Link>
-                    </li>
-                  ))}
+                  ].map(([href, label]) => {
+                    const selected =
+                      path === href ||
+                      (href === "/manage-events" &&
+                        path.startsWith("/update-event/"));
+                    return (
+                      <li key={href}>
+                        <Link
+                          href={href}
+                          aria-current={
+                            path === href
+                              ? "page"
+                              : selected
+                                ? "location"
+                                : undefined
+                          }
+                          className={
+                            selected
+                              ? "bg-success/10 font-semibold text-success"
+                              : undefined
+                          }
+                          onClick={(e) =>
+                            e.currentTarget
+                              .closest("details")
+                              .removeAttribute("open")
+                          }
+                        >
+                          {label}
+                        </Link>
+                      </li>
+                    );
+                  })}
                 </ul>
               </details>
               <button className="btn btn-outline btn-sm" onClick={logout}>
@@ -98,7 +127,11 @@ export default function Navbar() {
               </button>
             </>
           ) : (
-            <Link className="btn btn-success btn-sm" href="/login">
+            <Link
+              aria-current={path === "/login" ? "page" : undefined}
+              className="btn btn-success btn-sm"
+              href="/login"
+            >
               Log in
             </Link>
           )}
