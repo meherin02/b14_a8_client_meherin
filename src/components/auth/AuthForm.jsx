@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -14,6 +14,8 @@ export default function AuthForm({
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [googleEnabled, setGoogleEnabled] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const passwordId = useId();
   const router = useRouter();
   useEffect(() => {
     fetch(`${API_URL}/api/config`)
@@ -113,19 +115,38 @@ export default function AuthForm({
               />
             </label>
           )}
-          <label className="block">
-            Password
-            <input
-              className="input mt-1 w-full"
-              name="password"
-              type="password"
-              autoComplete={isRegister ? "new-password" : "current-password"}
-              required
-              maxLength={128}
-            />
-          </label>
+          <div>
+            <label htmlFor={passwordId} className="block">
+              Password
+            </label>
+            <div className="relative mt-1">
+              <input
+                id={passwordId}
+                className="input w-full pr-20"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete={isRegister ? "new-password" : "current-password"}
+                aria-describedby={isRegister ? `${passwordId}-hint` : undefined}
+                required
+                maxLength={128}
+              />
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm absolute right-1 top-1/2 z-10 -translate-y-1/2"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-controls={passwordId}
+                aria-pressed={showPassword}
+                onClick={() => setShowPassword((visible) => !visible)}
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
+          </div>
           {isRegister && (
-            <p className="text-sm text-base-content/65">
+            <p
+              id={`${passwordId}-hint`}
+              className="text-sm text-base-content/65"
+            >
               At least 6 characters, including uppercase and lowercase letters.
             </p>
           )}
