@@ -1,66 +1,87 @@
 # Community Events
 
-A community service platform for discovering, organizing, and joining social development events.
+Community Events brings local volunteering opportunities into one place. Find a cause you care about, join an upcoming event, or organize something for your neighborhood—from a park cleanup to a clothing donation drive.
 
-**Live website:** [communityevents-mauve.vercel.app](https://communityevents-mauve.vercel.app/)
-
-**API health:** [community-events-api-r0ne.onrender.com/api/health](https://community-events-api-r0ne.onrender.com/api/health)
+**[Live website](https://communityevents-mauve.vercel.app/)** · **[Server repository](https://github.com/meherin02/b14_a8_server_meherin)**
 
 ## Features
 
-- Browse upcoming community events, search by title or location, and filter by event type.
-- View public event details, including the date, location, description, and thumbnail.
-- Register and log in with email/password or Google. Existing users can connect Google from their profile.
-- Create events with required fields and future-date validation.
-- Manage your own events with editing and a delete confirmation dialog; the API enforces organizer ownership.
-- Join events and view your joined events in date order. The API rejects duplicate registrations.
+- Browse upcoming events, search by title or location, and filter by category.
+- Read event details before signing in, then log in to join.
+- Create events with a description, photo, location, category, and future date.
+- Edit or delete events you organize from Manage Events.
+- Keep track of your joined events in date order.
+- Register with email and password or sign in with Google. Existing users can connect Google from their profile.
 - Update your profile name and picture.
-- Switch between light and dark themes, with your choice saved in the browser.
-- View loading skeletons, empty states, toast feedback, and error recovery controls.
-- Explore a home page with a banner, application features, six upcoming events, an illustrative gallery, and a newsletter design.
+- Switch between light and dark themes, with your preference saved for your next visit.
 
-The newsletter is a design section only. Gallery images use Unsplash image URLs; event thumbnails use the organizer's submitted image URL.
+The home page includes up to six upcoming events, a community gallery, and a newsletter section. The newsletter is a visual preview and does not collect subscriptions. Loading skeletons, toast messages, and empty states explain what is happening throughout the app. The layout adapts to phones, tablets, and desktops, with subtle scroll effects that respect reduced-motion preferences.
 
-## Stack
+## Built with
 
-Next.js App Router, JavaScript, Tailwind CSS, DaisyUI, BetterAuth, and Sonner. The separate backend uses Express, MongoDB, the BetterAuth MongoDB adapter, and JWT validation.
+| Part | Tools |
+| --- | --- |
+| Frontend | Next.js App Router, React, JavaScript |
+| Styling | Tailwind CSS, DaisyUI |
+| Authentication | BetterAuth |
+| Notifications | Sonner |
+| Backend | Express, MongoDB, JWT |
+| Hosting | Vercel and Render |
 
 ## Run locally
 
-1. Install Node.js 24 and run `npm ci` inside this client repository.
-2. Copy `.env.example` to `.env.local` if that file does not already exist.
-3. Keep `NEXT_PUBLIC_API_URL=http://localhost:5000` for local development.
-4. Configure and start the separate Express server using that repository's README.
-5. Run `npm run dev` and open `http://localhost:3000`.
+You will need Node.js 24 and the separate API running on port 5000. Follow the [server setup guide](https://github.com/meherin02/b14_a8_server_meherin#readme) first.
 
-Never put MongoDB credentials, the Google client secret, or `BETTER_AUTH_SECRET` in the client environment.
+1. Clone this repository and install dependencies:
 
-## Production configuration
+   ```sh
+   git clone https://github.com/meherin02/b14_a8_client_meherin.git
+   cd b14_a8_client_meherin
+   npm ci
+   ```
 
-The client is hosted on Vercel and the API on Render. Production requests use the website's `/api` paths, which Next.js proxies to the API so authentication cookies belong to the website domain.
+2. Copy `.env.example` to `.env.local` and use these local settings:
 
-Set this variable on the client host **before building**:
+   ```env
+   NEXT_PUBLIC_API_URL=http://localhost:5000
+   BACKEND_URL=http://localhost:5000
+   ```
 
-```env
-BACKEND_URL=https://community-events-api-r0ne.onrender.com
-```
+3. Start the client:
 
-On the server host, set both `CLIENT_URL` and `BETTER_AUTH_URL` to `https://communityevents-mauve.vercel.app`. Servers sharing the same authentication database must use the same `BETTER_AUTH_SECRET`, including the secret used to encrypt its existing JWT keys.
+   ```sh
+   npm run dev
+   ```
 
-Google OAuth configuration:
+4. Open [localhost:3000](http://localhost:3000). Keep the API running while using the app.
+
+Database credentials and authentication secrets belong in the server environment, never in this client repository.
+
+## Commands
+
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the development server |
+| `npm run lint` | Check the source with ESLint |
+| `npm run build` | Create a production build |
+| `npm start` | Serve the production build |
+
+## Deployment
+
+On Vercel, set `BACKEND_URL=https://community-events-api-r0ne.onrender.com` before building. Production requests go through the website's `/api` routes to the Express server, so authentication cookies stay on the website domain.
+
+On Render, both `CLIENT_URL` and `BETTER_AUTH_URL` should be `https://communityevents-mauve.vercel.app`. Servers sharing an authentication database must use the same `BETTER_AUTH_SECRET` so existing signing keys remain readable.
+
+Configure these production entries in the Google OAuth client:
 
 - Authorized JavaScript origin: `https://communityevents-mauve.vercel.app`
 - Authorized redirect URI: `https://communityevents-mauve.vercel.app/api/auth/callback/google`
 
-Keep local OAuth entries if you also use local development. Rebuild/redeploy after changing production environment variables.
+Keep local OAuth entries if you also develop locally. Redeploy after changing environment variables, then check login, private-page refresh, event management, and joining on the live site.
 
-## Checks
+## More details
 
-```sh
-npm run lint
-npm run build
-```
+- [API contract](API-CONTRACT.md)
+- [Live API health](https://community-events-api-r0ne.onrender.com/api/health)
 
-After deployment, check login, private-page refresh, Google login, profile editing, event creation/update/deletion, joining, and ownership restrictions on the live website.
-
-See [API-CONTRACT.md](API-CONTRACT.md) for the routes and data format used by the client.
+The gallery uses Unsplash photos. Event photos come from the image URLs supplied by organizers.
