@@ -16,17 +16,35 @@ export const eventTypes = [
   "Education",
   "Other",
 ];
-export function EventImage({ src, alt, className = "" }) {
-  const [failed, setFailed] = useState(false);
-  const valid = typeof src === "string" && /^https?:\/\//.test(src);
-  return valid && !failed ? (
+function isHttpImageUrl(value) {
+  if (typeof value !== "string" || value.length > 2048) return false;
+  try {
+    const url = new URL(value);
+    return (
+      ["http:", "https:"].includes(url.protocol) &&
+      !url.username &&
+      !url.password
+    );
+  } catch {
+    return false;
+  }
+}
+export function EventImage({
+  src,
+  alt,
+  className = "",
+  fallbackLabel = "Community in action",
+}) {
+  const [failedSource, setFailedSource] = useState(null);
+  const valid = isHttpImageUrl(src);
+  return valid && failedSource !== src ? (
     <Image
       src={src}
       alt={alt}
       width={900}
       height={600}
       unoptimized
-      onError={() => setFailed(true)}
+      onError={() => setFailedSource(src)}
       className={`object-cover ${className}`}
     />
   ) : (
@@ -34,7 +52,7 @@ export function EventImage({ src, alt, className = "" }) {
       className={`flex items-center justify-center bg-success/10 text-success ${className}`}
       aria-label={alt}
     >
-      Community in action
+      {fallbackLabel}
     </div>
   );
 }
@@ -342,6 +360,7 @@ function LoadedEditor({ id }) {
 }
 function EventForm({ initial = {}, id }) {
   const [busy, setBusy] = useState(false);
+  const [previewImage, setPreviewImage] = useState(initial.image || "");
   const [message, setMessage] = useState("");
   const router = useRouter();
   const { data: session } = authClient.useSession();
@@ -360,8 +379,9 @@ function EventForm({ initial = {}, id }) {
     )
       error = "Please complete every field.";
     else if (!eventTypes.includes(values.type)) error = "Select an event type.";
-    else if (!/^https?:\/\//.test(values.image))
-      error = "Use an image URL starting with https:// or http://.";
+    else if (!isHttpImageUrl(values.image))
+      error =
+        "Use a valid HTTP(S) image URL of at most 2048 characters, without embedded login details.";
     else if (
       !Number.isFinite(new Date(values.date).getTime()) ||
       values.date < minimum
@@ -469,9 +489,31 @@ function EventForm({ initial = {}, id }) {
           className="input mt-2 w-full"
           required
           defaultValue={initial.image}
+          maxLength={2048}
+          aria-describedby="event-image-help"
+          onBlur={(event) => setPreviewImage(event.currentTarget.value.trim())}
           placeholder="https://example.com/event.jpg"
         />
       </label>
+      <figure>
+        <EventImage
+          src={previewImage}
+          alt="Event thumbnail preview"
+          fallbackLabel={
+            previewImage
+              ? "Image preview unavailable — check the link"
+              : "Add an image link to preview"
+          }
+          className="h-52 w-full rounded-2xl"
+        />
+        <figcaption
+          id="event-image-help"
+          className="mt-3 text-sm text-base-content/65"
+        >
+          Paste a direct image link, then leave the field to preview it. Choose
+          a clear photo that represents your event.
+        </figcaption>
+      </figure>
       {message && (
         <p role="alert" className="text-error">
           {message}
