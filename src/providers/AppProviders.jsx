@@ -4,7 +4,7 @@ export default function AppProviders({ children }) {
   return (
     <>
       {children}
-      <Toaster richColors position="top-right" />
+      <Toaster richColors position="top-right" duration={3000} />
     </>
   );
 }
