@@ -1,6 +1,6 @@
 # API expected by the client
 
-Base URL: `NEXT_PUBLIC_API_URL`, default `http://localhost:5000`.
+Local API origin: `NEXT_PUBLIC_API_URL`, default `http://localhost:5000`. In production, requests use the website's `/api` paths and Next.js forwards them to `BACKEND_URL`.
 The client sends cookies. Protected requests also send a JWT obtained through BetterAuth's `/api/auth/token` endpoint.
 
 ## Event fields
@@ -20,21 +20,21 @@ The client sends cookies. Protected requests also send a JWT obtained through Be
 
 Types: Cleanup, Plantation, Donation, Education, Other.
 
-| Method | Route | Response / purpose |
-| --- | --- | --- |
-| GET | `/api/events` | `{ "events": [...] }`; future events sorted by date |
-| GET | `/api/events?limit=6` | Same shape, future events sorted by date with MongoDB `.limit(6)` |
-| GET | `/api/events/:id` | `{ "event": {...} }`; public details |
-| GET | `/api/events/mine` | `{ "events": [...] }`; authenticated creator's events |
-| POST | `/api/events` | Create from form fields; protected |
-| PATCH | `/api/events/:id` | Update form fields; authenticated owner only |
-| DELETE | `/api/events/:id` | Delete; authenticated owner only |
-| POST | `/api/registrations` | Body `{ "eventId": "..." }`; protected, reject duplicate/past joins |
-| GET | `/api/registrations/me` | `{ "events": [...] }`; joined events including event details, sorted by date |
-| GET | `/api/config` | `{ "googleEnabled": true/false }` |
+| Method | Route                   | Response / purpose                                                           |
+| ------ | ----------------------- | ---------------------------------------------------------------------------- |
+| GET    | `/api/events`           | `{ "events": [...] }`; future events sorted by date                          |
+| GET    | `/api/events?limit=6`   | Same shape, future events sorted by date with MongoDB `.limit(6)`            |
+| GET    | `/api/events/:id`       | `{ "event": {...} }`; public details                                         |
+| GET    | `/api/events/mine`      | `{ "events": [...] }`; authenticated creator's events                        |
+| POST   | `/api/events`           | Create from form fields; protected                                           |
+| PATCH  | `/api/events/:id`       | Update form fields; authenticated owner only                                 |
+| DELETE | `/api/events/:id`       | Delete; authenticated owner only                                             |
+| POST   | `/api/registrations`    | Body `{ "eventId": "..." }`; protected, reject duplicate/past joins          |
+| GET    | `/api/registrations/me` | `{ "events": [...] }`; joined events including event details, sorted by date |
+| GET    | `/api/config`           | `{ "googleEnabled": true/false }`                                            |
 
 Create/update body fields: title, description, type, image, location, date (`YYYY-MM-DD`). Derive creator identity from the verified session on the server, never from an email in request JSON. Validate future dates, fields, ownership, IDs, and registration permissions on the server. Register `/mine` before `/:id` in Express.
 
 Mutation success responses must use JSON. Return a non-2xx status with `{ "message": "Helpful error text" }` on failure. Return 404 for missing events and 409 for duplicate joins. Deleting an event should remove associated registrations.
 
-These event endpoints are not implemented in the setup-stage server yet. Until connected, event areas show loading/error states and cannot save or join real events. BetterAuth handles profile updates through its own API.
+These event endpoints are implemented in the Express server. BetterAuth handles profile updates and explicit Google account linking through its own API. If the API is unavailable, event areas display an error state with a retry action.

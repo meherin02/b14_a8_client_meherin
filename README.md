@@ -1,42 +1,66 @@
 # Community Events
 
-A social development events platform for local community service.
+A community service platform for discovering, organizing, and joining social development events.
 
-Live URL: pending deployment.
+**Live website:** [communityevents-mauve.vercel.app](https://communityevents-mauve.vercel.app/)
 
-## Setup-stage features
+**API health:** [community-events-api-r0ne.onrender.com/api/health](https://community-events-api-r0ne.onrender.com/api/health)
 
-- Email/password registration and login interface using BetterAuth.
-- Password validation with uppercase, lowercase, and minimum-length rules.
-- Google sign-in integration, enabled after OAuth credentials are configured.
-- Session-aware protected account page that waits for session loading.
-- Toast success/error feedback.
-- JWT-authenticated API connection check.
+## Features
+
+- Browse upcoming community events, search by title or location, and filter by event type.
+- View public event details, including the date, location, description, and thumbnail.
+- Register and log in with email/password or Google. Existing users can connect Google from their profile.
+- Create events with required fields and future-date validation.
+- Manage your own events with editing and a delete confirmation dialog; the API enforces organizer ownership.
+- Join events and view your joined events in date order. The API rejects duplicate registrations.
+- Update your profile name and picture.
+- Switch between light and dark themes, with your choice saved in the browser.
+- View loading skeletons, empty states, toast feedback, and error recovery controls.
+- Explore a home page with a banner, application features, six upcoming events, an illustrative gallery, and a newsletter design.
+
+The newsletter is a design section only. Gallery images use Unsplash image URLs; event thumbnails use the organizer's submitted image URL.
+
+## Stack
+
+Next.js App Router, JavaScript, Tailwind CSS, DaisyUI, BetterAuth, and Sonner. The separate backend uses Express, MongoDB, the BetterAuth MongoDB adapter, and JWT validation.
 
 ## Run locally
 
-1. Run `npm install` if dependencies are not installed.
-2. Copy `.env.example` to `.env.local` if it does not already exist.
-3. Configure and start the sibling Express server using its README.
-4. Run `npm run dev` and visit http://localhost:3000.
+1. Install Node.js 24 and run `npm ci` inside this client repository.
+2. Copy `.env.example` to `.env.local` if that file does not already exist.
+3. Keep `NEXT_PUBLIC_API_URL=http://localhost:5000` for local development.
+4. Configure and start the separate Express server using that repository's README.
+5. Run `npm run dev` and open `http://localhost:3000`.
 
-Checks: `npm run lint` and `npm run build`.
+Never put MongoDB credentials, the Google client secret, or `BETTER_AUTH_SECRET` in the client environment.
 
-## Production API routing
+## Production configuration
 
-The production client calls `/api` on its own domain. Next.js forwards those calls to `BACKEND_URL`, which must be set to the live Express server origin on the client host before building. Local development keeps the existing `NEXT_PUBLIC_API_URL` setting.
+The client is hosted on Vercel and the API on Render. Production requests use the website's `/api` paths, which Next.js proxies to the API so authentication cookies belong to the website domain.
 
-For live authentication, set the server's `CLIENT_URL` and `BETTER_AUTH_URL` to the live client origin, and register `https://YOUR_CLIENT_DOMAIN/api/auth/callback/google` in Google Cloud. This keeps authentication cookies on the client domain. Use the real deployed domain when configuring these values; local settings remain unchanged.
+Set this variable on the client host **before building**:
 
-## Client pages and features
+```env
+BACKEND_URL=https://community-events-api-r0ne.onrender.com
+```
 
-- Community home page with banner, features, recent events, gallery and newsletter design.
-- Upcoming events with title/location search and category filters.
-- Public event details and authenticated joining controls.
-- Create/update event forms with future-date validation.
-- Manage events with edit links and delete confirmation.
-- Joined events ordered by date.
-- Editable profile, account dropdown and logout.
-- Saved light/dark theme, loading skeletons, empty states and error recovery.
+On the server host, set both `CLIENT_URL` and `BETTER_AUTH_URL` to `https://communityevents-mauve.vercel.app`. Servers sharing the same authentication database must use the same `BETTER_AUTH_SECRET`, including the secret used to encrypt its existing JWT keys.
 
-The client screens and API calls are implemented. Event operations still need the server endpoints described in `API-CONTRACT.md`. Live registration, session persistence, profile updates, Google login and event CRUD/joining need end-to-end testing after database and server setup. The newsletter is a visual section only, as permitted by the assignment. Static illustrative photographs use Unsplash image URLs; event thumbnails come from the database. Deployment and the live URL are still pending.
+Google OAuth configuration:
+
+- Authorized JavaScript origin: `https://communityevents-mauve.vercel.app`
+- Authorized redirect URI: `https://communityevents-mauve.vercel.app/api/auth/callback/google`
+
+Keep local OAuth entries if you also use local development. Rebuild/redeploy after changing production environment variables.
+
+## Checks
+
+```sh
+npm run lint
+npm run build
+```
+
+After deployment, check login, private-page refresh, Google login, profile editing, event creation/update/deletion, joining, and ownership restrictions on the live website.
+
+See [API-CONTRACT.md](API-CONTRACT.md) for the routes and data format used by the client.
