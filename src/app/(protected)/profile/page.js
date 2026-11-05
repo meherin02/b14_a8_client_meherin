@@ -3,6 +3,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import { EventImage } from "@/components/events/EventViews";
+import GoogleConnection from "@/components/auth/GoogleConnection";
 export default function ProfilePage() {
   const { data: session } = authClient.useSession();
   const [busy, setBusy] = useState(false);
@@ -72,6 +73,7 @@ export default function ProfilePage() {
           {busy ? "Saving…" : "Save profile"}
         </button>
       </form>
+      <GoogleConnection />
     </section>
   );
 }
