@@ -14,12 +14,14 @@ export default function ThemeToggle() {
     document.documentElement.dataset.theme = next;
     try {
       localStorage.setItem("community-theme", next);
-    } catch { /* The theme still works when browser storage is unavailable. */ }
+    } catch {
+      /* The theme still works when browser storage is unavailable. */
+    }
     window.dispatchEvent(new Event("community-theme"));
   }
   return (
     <button
-      className="btn btn-ghost btn-sm"
+      className="btn btn-ghost min-h-11 px-3 text-sm"
       onClick={toggle}
       aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} theme`}
     >

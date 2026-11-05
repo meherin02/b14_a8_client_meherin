@@ -34,6 +34,7 @@ export function EventImage({
   alt,
   className = "",
   fallbackLabel = "Community in action",
+  eager = false,
 }) {
   const [failedSource, setFailedSource] = useState(null);
   const valid = isHttpImageUrl(src);
@@ -44,6 +45,8 @@ export function EventImage({
       width={900}
       height={600}
       unoptimized
+      loading={eager ? "eager" : "lazy"}
+      fetchPriority={eager ? "high" : undefined}
       onError={() => setFailedSource(src)}
       className={`object-cover ${className}`}
     />
@@ -125,7 +128,7 @@ export function EventCard({ event }) {
       <EventImage
         src={event.image}
         alt={event.title}
-        className="h-52 w-full shrink-0"
+        className="h-48 w-full shrink-0 sm:h-52"
       />
       <div className="card-body flex-1 gap-3">
         <span className="text-xs font-bold uppercase tracking-widest text-success">
@@ -201,8 +204,8 @@ export function EventList({ home = false, joined = false, manage = false }) {
   return (
     <div className="space-y-6">
       {!home && (
-        <div className="flex flex-wrap gap-3">
-          <label className="input flex-1 min-w-48">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+          <label className="input w-full min-w-0 sm:min-w-48 sm:flex-1">
             <span className="sr-only">Search events</span>
             <input
               type="search"
@@ -211,10 +214,10 @@ export function EventList({ home = false, joined = false, manage = false }) {
               placeholder="Search by title or location"
             />
           </label>
-          <label>
+          <label className="w-full sm:w-auto">
             <span className="sr-only">Event type</span>
             <select
-              className="select"
+              className="select w-full sm:w-auto"
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
             >
@@ -226,7 +229,7 @@ export function EventList({ home = false, joined = false, manage = false }) {
           {hasFilters && (
             <button
               type="button"
-              className="btn btn-outline"
+              className="btn btn-outline w-full sm:w-auto"
               onClick={clearFilters}
             >
               Clear filters
@@ -321,27 +324,31 @@ export function EventDetails({ id }) {
   const event = resource.data?.event || resource.data;
   const past = new Date(event.date).getTime() <= resource.loadedAt;
   return (
-    <article className="mx-auto max-w-4xl">
+    <article className="mx-auto min-w-0 max-w-4xl">
       <Link href="/events" className="link text-sm">
         ← All upcoming events
       </Link>
       <EventImage
         src={event.image}
         alt={event.title}
-        className="mt-6 h-72 w-full rounded-3xl sm:h-96"
+        className="mt-5 h-56 w-full rounded-2xl sm:mt-6 sm:h-96 sm:rounded-3xl"
       />
-      <div className="mt-8 grid gap-8 md:grid-cols-[1fr_260px]">
-        <div>
+      <div className="mt-6 grid gap-6 sm:mt-8 sm:gap-8 md:grid-cols-[minmax(0,1fr)_260px]">
+        <div className="min-w-0">
           <p className="eyebrow">{event.type}</p>
-          <h1 className="mt-3 text-4xl font-bold">{event.title}</h1>
-          <p className="mt-6 whitespace-pre-wrap leading-8 text-base-content/75">
+          <h1 className="mt-3 text-3xl font-bold leading-tight [overflow-wrap:anywhere] sm:text-4xl">
+            {event.title}
+          </h1>
+          <p className="mt-5 whitespace-pre-wrap leading-7 text-base-content/75 [overflow-wrap:anywhere] sm:mt-6 sm:leading-8">
             {event.description}
           </p>
         </div>
         <aside className="h-fit rounded-2xl border border-base-300 p-6">
           <h2 className="font-bold">Be part of the change</h2>
           <p className="mt-4">{dateLabel(event.date)}</p>
-          <p className="mt-2 text-base-content/65">{event.location}</p>
+          <p className="mt-2 text-base-content/65 [overflow-wrap:anywhere]">
+            {event.location}
+          </p>
           <JoinEventButton eventId={id} ended={past} />
         </aside>
       </div>
@@ -412,15 +419,15 @@ function EventForm({ initial = {}, id }) {
   return (
     <form
       onSubmit={submit}
-      className="mx-auto max-w-2xl space-y-6 rounded-3xl border border-base-300 bg-base-100 p-6 sm:p-10"
+      className="mx-auto min-w-0 max-w-2xl space-y-5 rounded-2xl border border-base-300 bg-base-100 p-5 sm:space-y-6 sm:rounded-3xl sm:p-10"
     >
       <p className="eyebrow">
         {id ? "Keep everyone informed" : "Bring your community together"}
       </p>
-      <h1 className="text-3xl font-bold">
+      <h1 className="text-2xl font-bold sm:text-3xl">
         {id ? "Update your event" : "Create an event"}
       </h1>
-      <p className="text-sm text-base-content/65">
+      <p className="text-sm text-base-content/65 [overflow-wrap:anywhere]">
         Organizing as {session?.user.email}
       </p>
       <label className="block">
@@ -445,7 +452,7 @@ function EventForm({ initial = {}, id }) {
           placeholder="What will volunteers do? What should they bring?"
         />
       </label>
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="grid gap-5 sm:grid-cols-2 [&>label]:min-w-0">
         <label>
           Event type
           <select
@@ -463,7 +470,7 @@ function EventForm({ initial = {}, id }) {
           <input
             type="date"
             name="date"
-            className="input mt-2 w-full"
+            className="input mt-2 w-full min-w-0"
             min={minimum}
             required
             defaultValue={initial.date?.slice(0, 10)}
@@ -519,12 +526,15 @@ function EventForm({ initial = {}, id }) {
           {message}
         </p>
       )}
-      <div className="flex flex-wrap gap-3">
-        <button className="btn btn-success" disabled={busy}>
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+        <button
+          className="btn btn-success min-h-12 w-full sm:w-auto"
+          disabled={busy}
+        >
           {busy ? "Saving…" : id ? "Save changes" : "Publish event"}
         </button>
         <Link
-          className="btn btn-ghost"
+          className="btn btn-ghost min-h-12 w-full sm:w-auto"
           href={id ? "/manage-events" : "/events"}
         >
           Cancel

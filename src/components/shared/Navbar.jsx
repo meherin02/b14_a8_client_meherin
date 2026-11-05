@@ -5,6 +5,8 @@ import { useRouter, usePathname } from "next/navigation";
 import { toast } from "sonner";
 import { authClient } from "@/lib/auth-client";
 import ThemeToggle from "./ThemeToggle";
+import BrandMark from "./BrandMark";
+import MobileNavigation from "./MobileNavigation";
 export default function Navbar() {
   const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
@@ -22,23 +24,23 @@ export default function Navbar() {
     }
   }
   return (
-    <header className="border-b border-base-300">
+    <header className="sticky top-0 z-40 border-b border-base-300 bg-base-100/95 backdrop-blur-lg">
       <nav
         aria-label="Main navigation"
-        className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-5 py-4"
+        className="relative mx-auto flex min-h-18 max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-5"
       >
         <Link
           href="/"
           aria-current={path === "/" ? "page" : undefined}
-          className="text-lg font-bold tracking-tight sm:text-xl"
+          className="flex shrink-0 items-center gap-2.5 rounded-lg font-bold tracking-tight"
         >
-          Community
-          <span className="text-success">
-            {" "}
-            Events<span aria-hidden="true"> ↗</span>
+          <BrandMark className="h-9 w-9 text-success" />
+          <span className="flex flex-col text-sm leading-tight sm:flex-row sm:gap-1 sm:text-lg lg:text-xl">
+            <span>Community</span>
+            <span className="text-success">Events</span>
           </span>
         </Link>
-        <div className="flex flex-wrap items-center gap-2 sm:gap-4">
+        <div className="hidden items-center gap-3 md:flex lg:gap-5">
           <Link
             href="/events"
             aria-current={
@@ -135,6 +137,15 @@ export default function Navbar() {
               Log in
             </Link>
           )}
+        </div>
+        <div className="flex shrink-0 items-center gap-1 md:hidden">
+          <ThemeToggle />
+          <MobileNavigation
+            user={session?.user}
+            loading={isPending}
+            pathname={path}
+            onLogout={logout}
+          />
         </div>
       </nav>
     </header>
