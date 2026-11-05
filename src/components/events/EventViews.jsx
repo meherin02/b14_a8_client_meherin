@@ -143,6 +143,12 @@ export function EventList({ home = false, joined = false, manage = false }) {
   const [query, setQuery] = useState("");
   const [deleting, setDeleting] = useState(null);
   const [busy, setBusy] = useState(false);
+  const normalizedQuery = query.trim().toLowerCase();
+  const hasFilters = query.length > 0 || filter !== "All";
+  function clearFilters() {
+    setQuery("");
+    setFilter("All");
+  }
   const events = Array.isArray(resource.data)
     ? resource.data
     : resource.data?.events || [];
@@ -155,7 +161,7 @@ export function EventList({ home = false, joined = false, manage = false }) {
         (filter === "All" || event.type === filter) &&
         `${event.title} ${event.location}`
           .toLowerCase()
-          .includes(query.toLowerCase()),
+          .includes(normalizedQuery),
     )
     .sort((a, b) => new Date(a.date) - new Date(b.date));
   async function remove() {
@@ -181,6 +187,7 @@ export function EventList({ home = false, joined = false, manage = false }) {
           <label className="input flex-1 min-w-48">
             <span className="sr-only">Search events</span>
             <input
+              type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Search by title or location"
@@ -198,7 +205,21 @@ export function EventList({ home = false, joined = false, manage = false }) {
               ))}
             </select>
           </label>
+          {hasFilters && (
+            <button
+              type="button"
+              className="btn btn-outline"
+              onClick={clearFilters}
+            >
+              Clear filters
+            </button>
+          )}
         </div>
+      )}
+      {!home && !resource.loading && !resource.error && (
+        <p role="status" className="text-sm text-base-content/65">
+          {displayed.length} {displayed.length === 1 ? "event" : "events"} found
+        </p>
       )}
       {resource.loading ? (
         <EventSkeleton />
@@ -207,23 +228,37 @@ export function EventList({ home = false, joined = false, manage = false }) {
       ) : !displayed.length ? (
         <div className="rounded-2xl border border-dashed border-base-300 px-6 py-14 text-center">
           <h3 className="text-xl font-bold">
-            {joined
-              ? "Your next good deed starts here"
-              : manage
-                ? "Your community is waiting"
-                : "No matching events yet"}
+            {hasFilters
+              ? "No events match these filters"
+              : joined
+                ? "Your next good deed starts here"
+                : manage
+                  ? "Your community is waiting"
+                  : "No matching events yet"}
           </h3>
           <p className="mt-3 text-base-content/65">
-            {manage
-              ? "Create your first event and invite others to make a difference."
-              : "Explore other categories or check back for new opportunities."}
+            {hasFilters
+              ? "Try another title or location, choose a different event type, or clear your filters."
+              : manage
+                ? "Create your first event and invite others to make a difference."
+                : "Explore other categories or check back for new opportunities."}
           </p>
-          <Link
-            href={manage ? "/create-event" : "/events"}
-            className="btn btn-success mt-5"
-          >
-            {manage ? "Create an event" : "Explore events"}
-          </Link>
+          {hasFilters ? (
+            <button
+              type="button"
+              className="btn btn-success mt-5"
+              onClick={clearFilters}
+            >
+              Clear filters
+            </button>
+          ) : (
+            <Link
+              href={manage ? "/create-event" : "/events"}
+              className="btn btn-success mt-5"
+            >
+              {manage ? "Create an event" : "Explore events"}
+            </Link>
+          )}
         </div>
       ) : (
         <div className="grid auto-rows-fr items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3">
