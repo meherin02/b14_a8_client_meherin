@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { api } from "@/lib/api";
 import { authClient } from "@/lib/auth-client";
+import JoinEventButton from "./JoinEventButton";
 
 export const eventTypes = [
   "Cleanup",
@@ -286,35 +287,10 @@ export function EventList({ home = false, joined = false, manage = false }) {
 }
 export function EventDetails({ id }) {
   const resource = useResource(`/api/events/${encodeURIComponent(id)}`);
-  const { data: session, isPending } = authClient.useSession();
-  const [busy, setBusy] = useState(false);
-  const [joined, setJoined] = useState(false);
-  const router = useRouter();
   if (resource.loading) return <EventSkeleton />;
   if (resource.error) return <RequestError retry={resource.retry} />;
   const event = resource.data?.event || resource.data;
   const past = new Date(event.date).getTime() <= resource.loadedAt;
-  async function join() {
-    if (!session) {
-      toast.info("Please log in to join this event.");
-      router.push(`/login?next=${encodeURIComponent(`/events/${id}`)}`);
-      return;
-    }
-    setBusy(true);
-    try {
-      await api("/api/registrations", {
-        method: "POST",
-        protected: true,
-        body: JSON.stringify({ eventId: id }),
-      });
-      setJoined(true);
-      toast.success("You have joined this event!");
-    } catch (error) {
-      toast.error(error.message);
-    } finally {
-      setBusy(false);
-    }
-  }
   return (
     <article className="mx-auto max-w-4xl">
       <Link href="/events" className="link text-sm">
@@ -337,24 +313,7 @@ export function EventDetails({ id }) {
           <h2 className="font-bold">Be part of the change</h2>
           <p className="mt-4">{dateLabel(event.date)}</p>
           <p className="mt-2 text-base-content/65">{event.location}</p>
-          <button
-            className="btn btn-success mt-6 w-full"
-            disabled={busy || isPending || past || joined}
-            onClick={join}
-          >
-            {joined
-              ? "Joined ✓"
-              : past
-                ? "Event has ended"
-                : busy
-                  ? "Joining…"
-                  : "Join event"}
-          </button>
-          {joined && (
-            <Link href="/joined-events" className="link mt-4 block text-sm">
-              View your joined events
-            </Link>
-          )}
+          <JoinEventButton eventId={id} ended={past} />
         </aside>
       </div>
     </article>

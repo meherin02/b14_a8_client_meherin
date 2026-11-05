@@ -20,6 +20,8 @@ The client sends cookies. Protected requests also send a JWT obtained through Be
 
 Types: Cleanup, Plantation, Donation, Education, Other.
 
+`GET /api/registrations/events/:id/status` is protected and returns `{ "joined": true/false }` for the signed-in user only. Event details use this uncached status to keep the Joined button correct after refreshing or switching accounts.
+
 | Method | Route                   | Response / purpose                                                           |
 | ------ | ----------------------- | ---------------------------------------------------------------------------- |
 | GET    | `/api/events`           | `{ "events": [...] }`; future events sorted by date                          |
