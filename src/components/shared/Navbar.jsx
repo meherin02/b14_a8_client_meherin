@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
@@ -8,10 +9,33 @@ import ThemeToggle from "./ThemeToggle";
 import BrandMark from "./BrandMark";
 import MobileNavigation from "./MobileNavigation";
 export default function Navbar() {
+  const accountMenu = useRef(null);
   const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
   const path = usePathname();
   const browsingEvents = path === "/events" || path.startsWith("/events/");
+  useEffect(() => {
+    function closeOutside(event) {
+      const menu = accountMenu.current;
+      if (menu?.open && !menu.contains(event.target)) {
+        menu.removeAttribute("open");
+      }
+    }
+    function closeOnEscape(event) {
+      const menu = accountMenu.current;
+      if (event.key === "Escape" && menu?.open) {
+        event.preventDefault();
+        menu.removeAttribute("open");
+        menu.querySelector("summary")?.focus();
+      }
+    }
+    document.addEventListener("pointerdown", closeOutside);
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.removeEventListener("pointerdown", closeOutside);
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, []);
   async function logout() {
     try {
       const result = await authClient.signOut();
@@ -62,7 +86,7 @@ export default function Navbar() {
             />
           ) : session ? (
             <>
-              <details className="dropdown dropdown-end">
+              <details ref={accountMenu} className="dropdown dropdown-end">
                 <summary
                   className="btn btn-circle btn-ghost"
                   title={session.user.name}
