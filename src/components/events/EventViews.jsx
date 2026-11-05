@@ -101,16 +101,22 @@ function RequestError({ retry }) {
 }
 export function EventCard({ event }) {
   return (
-    <article className="card overflow-hidden border border-base-300 bg-base-100">
-      <EventImage src={event.image} alt={event.title} className="h-52 w-full" />
-      <div className="card-body">
+    <article className="card h-full min-w-0 flex-1 overflow-hidden border border-base-300 bg-base-100">
+      <EventImage
+        src={event.image}
+        alt={event.title}
+        className="h-52 w-full shrink-0"
+      />
+      <div className="card-body flex-1 gap-3">
         <span className="text-xs font-bold uppercase tracking-widest text-success">
           {event.type}
         </span>
-        <h3 className="card-title">{event.title}</h3>
-        <p className="text-sm text-base-content/65">{event.location}</p>
-        <p className="text-sm">{dateLabel(event.date)}</p>
-        <div className="card-actions mt-4">
+        <h3 className="card-title [overflow-wrap:anywhere]">{event.title}</h3>
+        <p className="grow-0 text-sm text-base-content/65 [overflow-wrap:anywhere]">
+          {event.location}
+        </p>
+        <p className="grow-0 text-sm">{dateLabel(event.date)}</p>
+        <div className="card-actions mt-auto pt-4">
           <Link
             href={`/events/${event._id}`}
             className="btn btn-outline w-full"
@@ -141,7 +147,9 @@ export function EventList({ home = false, joined = false, manage = false }) {
   const displayed = events
     .filter(
       (event) =>
-        (joined || manage || new Date(event.date).getTime() > resource.loadedAt) &&
+        (joined ||
+          manage ||
+          new Date(event.date).getTime() > resource.loadedAt) &&
         (filter === "All" || event.type === filter) &&
         `${event.title} ${event.location}`
           .toLowerCase()
@@ -216,9 +224,9 @@ export function EventList({ home = false, joined = false, manage = false }) {
           </Link>
         </div>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid auto-rows-fr items-stretch gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {displayed.slice(0, home ? 6 : undefined).map((event) => (
-            <div key={event._id} className="flex flex-col gap-2">
+            <div key={event._id} className="flex min-w-0 flex-col gap-2">
               <EventCard event={event} />
               {manage && (
                 <div className="flex gap-2">
