@@ -1,13 +1,15 @@
 "use client";
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 export default function ProtectedLayout({ children }) {
   const { data: session, isPending, error, refetch } = authClient.useSession();
   const router = useRouter();
+  const pathname = usePathname();
   useEffect(() => {
-    if (!isPending && !error && !session) router.replace("/login");
-  }, [isPending, error, session, router]);
+    if (!isPending && !error && !session)
+      router.replace(`/login?next=${encodeURIComponent(pathname)}`);
+  }, [isPending, error, session, router, pathname]);
   if (isPending)
     return (
       <p role="status" className="py-12 text-center">

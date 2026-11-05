@@ -5,7 +5,12 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { authClient, API_URL } from "@/lib/auth-client";
 import { validateAuth } from "@/lib/validation";
-export default function AuthForm({ isRegister = false }) {
+import { safeReturnPath } from "@/lib/navigation.mjs";
+export default function AuthForm({
+  isRegister = false,
+  returnTo = "/profile",
+}) {
+  const destination = safeReturnPath(returnTo);
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [googleEnabled, setGoogleEnabled] = useState(false);
@@ -37,7 +42,7 @@ export default function AuthForm({ isRegister = false }) {
           });
       if (result.error) throw new Error(result.error.message);
       toast.success(isRegister ? "Your account is ready!" : "Welcome back!");
-      router.replace("/profile");
+      router.replace(destination);
       router.refresh();
     } catch (error) {
       const text =
@@ -53,7 +58,7 @@ export default function AuthForm({ isRegister = false }) {
     try {
       const result = await authClient.signIn.social({
         provider: "google",
-        callbackURL: `${window.location.origin}/profile`,
+        callbackURL: `${window.location.origin}${destination}`,
       });
       if (result.error) throw new Error(result.error.message);
     } catch (error) {
@@ -149,7 +154,7 @@ export default function AuthForm({ isRegister = false }) {
           {isRegister ? "Already have an account? " : "New here? "}
           <Link
             className="link font-semibold"
-            href={isRegister ? "/login" : "/register"}
+            href={`${isRegister ? "/login" : "/register"}?next=${encodeURIComponent(destination)}`}
           >
             {isRegister ? "Log in" : "Create an account"}
           </Link>

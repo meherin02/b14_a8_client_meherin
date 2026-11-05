@@ -297,7 +297,7 @@ export function EventDetails({ id }) {
   async function join() {
     if (!session) {
       toast.info("Please log in to join this event.");
-      router.push("/login");
+      router.push(`/login?next=${encodeURIComponent(`/events/${id}`)}`);
       return;
     }
     setBusy(true);
