@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ScrollReveal from "@/components/shared/ScrollReveal";
 import { EventList, EventImage } from "@/components/events/EventViews";
 const pictures = [
   "https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&w=1000&q=80",
@@ -7,7 +8,7 @@ const pictures = [
 ];
 export default function HomeContent() {
   return (
-    <div className="space-y-12 pb-4 sm:space-y-16 lg:space-y-20 lg:pb-8">
+    <ScrollReveal className="space-y-12 pb-4 sm:space-y-16 lg:space-y-20 lg:pb-8">
       <section className="grid overflow-hidden rounded-3xl bg-base-200 lg:grid-cols-2">
         <div className="p-6 py-9 sm:p-10 lg:p-14">
           <p className="eyebrow">Small actions. Shared purpose.</p>
@@ -172,6 +173,6 @@ export default function HomeContent() {
           </div>
         </div>
       </section>
-    </div>
+    </ScrollReveal>
   );
 }
