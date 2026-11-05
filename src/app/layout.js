@@ -4,8 +4,20 @@ import Navbar from "@/components/shared/Navbar";
 import Link from "next/link";
 
 export const metadata = {
+  metadataBase: new URL("https://communityevents-mauve.vercel.app"),
   title: "Community Events",
-  description: "Local events that make a difference.",
+  description:
+    "Discover, create, and join local community service events. Small actions make stronger communities.",
+  applicationName: "Community Events",
+  openGraph: {
+    type: "website",
+    siteName: "Community Events",
+    title: "Community Events — Small actions. Stronger communities.",
+    description:
+      "Find local volunteering opportunities, organize community events, and make a difference together.",
+    locale: "en_US",
+  },
+  twitter: { card: "summary_large_image" },
 };
 export default function RootLayout({ children }) {
   return (
