@@ -22,6 +22,12 @@ Live URL: pending deployment.
 
 Checks: `npm run lint` and `npm run build`.
 
+## Production API routing
+
+The production client calls `/api` on its own domain. Next.js forwards those calls to `BACKEND_URL`, which must be set to the live Express server origin on the client host before building. Local development keeps the existing `NEXT_PUBLIC_API_URL` setting.
+
+For live authentication, set the server's `CLIENT_URL` and `BETTER_AUTH_URL` to the live client origin, and register `https://YOUR_CLIENT_DOMAIN/api/auth/callback/google` in Google Cloud. This keeps authentication cookies on the client domain. Use the real deployed domain when configuring these values; local settings remain unchanged.
+
 ## Client pages and features
 
 - Community home page with banner, features, recent events, gallery and newsletter design.
